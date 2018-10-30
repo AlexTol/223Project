@@ -3,21 +3,37 @@ def holder(btn):
     print('nothing much')
 
 def hideRegion1():
-    app.hideTextArea('t1')
-    app.hideButton('Find Pam Sites')
+    try:
+        app.removeTextArea('t1')
+    except:
+        print('text area already hidden')
+    
+    try:    
+        app.removeButton('Find Pam Sites')
+    except:
+        print('widget already hidden')
+
 def showRegion1():
-    app.showTextArea('t1')
-    app.showButton('Find Pam Sites')
+    app.addScrolledTextArea('t1',3)
+    app.addButton('Find Pam Sites',holder,4)
 
 def hideRegion2():
-    app.hideButton('tba1')
+    try:
+        app.removeButton('tba1')
+    except:
+        print('widget already hidden')
+
 def showRegion2():
-    app.showButton('tba1')
+    app.addButton('tba1',holder,3)
 
 def hideRegion3():
-    app.hideButton('tba2')
+    try:
+        app.removeButton('tba2')
+    except:
+        print('widget already hidden')
+
 def showRegion3():
-    app.showButton('tba2')
+    app.addButton('tba2',holder,3)
 
 def changeFunc(rb):
     if(app.getRadioButton("option") == "Find all potential PAM sequences"):
@@ -32,22 +48,16 @@ def changeFunc(rb):
         hideRegion1()
         hideRegion2()
         showRegion3()
+        
 
 app = gui("CRISPR TOOL","400x400")
 
-app.addRadioButton("option", "Find all potential PAM sequences")
-app.addRadioButton("option", "Get Best GRNA for gene")
-app.addRadioButton("option", "Get Best GRNA for region")
+app.addRadioButton("option", "Find all potential PAM sequences",0,0)
+app.addRadioButton("option", "Get Best GRNA for gene",1)
+app.addRadioButton("option", "Get Best GRNA for region",2)
 app.setRadioButtonChangeFunction("option", changeFunc)
 
-app.addScrolledTextArea('t1')
-app.addButton('Find Pam Sites',holder)
+app.addScrolledTextArea('t1',3)
+app.addButton('Find Pam Sites',holder,4)
 
-app.addButton('tba1',holder)
-app.hideButton('tba1')
-
-app.addButton('tba2',holder)
-app.hideButton('tba2')
-
-app.add
 app.go()
