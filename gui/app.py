@@ -76,12 +76,12 @@ def hideRegion1():
         print('widget already hidden')
 
 def showRegion1():
-    app.addScrolledTextArea('t1',3)
-    app.addButton('Find Pam Sites',findPAMSites,4)
-    app.addLabel('l11','Template Strand Pam Sites:',5)
-    app.addLabel('l12','',6)
-    app.addLabel('l13','Sense Strand Pam Sites:',7)
-    app.addLabel('l14','',8)
+    app.addScrolledTextArea('t1',4)
+    app.addButton('Find Pam Sites',findPAMSites,5)
+    app.addLabel('l11','Template Strand Pam Sites:',6)
+    app.addLabel('l12','',7)
+    app.addLabel('l13','Sense Strand Pam Sites:',8)
+    app.addLabel('l14','',9)
     app.hideLabel('l11')
     app.hideLabel('l12')
     app.hideLabel('l13')
@@ -94,7 +94,7 @@ def hideRegion2():
         print('widget already hidden')
 
 def showRegion2():
-    app.addButton('tba1',holder,3)
+    app.addButton('tba1',holder,4)
 
 def hideRegion3():
     try:
@@ -103,7 +103,7 @@ def hideRegion3():
         print('widget already hidden')
 
 def showRegion3():
-    app.addButton('tba2',holder,3)
+    app.addButton('tba2',holder,4)
 
 def changeFunc(rb):
     if(app.getRadioButton("option") == "Find all potential PAM sequences"):
@@ -114,7 +114,7 @@ def changeFunc(rb):
         hideRegion1()
         hideRegion3()
         showRegion2()
-    elif(app.getRadioButton("option") == "Get Best GRNA for region"):
+    elif(app.getRadioButton("option") == "Get Best GRNA for chromosome"):
         hideRegion1()
         hideRegion2()
         showRegion3()
@@ -122,17 +122,18 @@ def changeFunc(rb):
 
 app = gui("CRISPR TOOL","400x400")
 
-app.addRadioButton("option", "Find all potential PAM sequences",0,0)
-app.addRadioButton("option", "Get Best GRNA for gene",1)
-app.addRadioButton("option", "Get Best GRNA for region",2)
+app.addRadioButton("option", "Find all potential PAM sequences",0)
+app.addRadioButton("option", "Get Best GRNA for strand",1)
+app.addRadioButton("option", "Get Best GRNA for gene",2)
+app.addRadioButton("option", "Get Best GRNA for region",3)
 app.setRadioButtonChangeFunction("option", changeFunc)
 
-app.addScrolledTextArea('t1',3)
-app.addButton('Find Pam Sites',findPAMSites,4)
-app.addLabel('l11','Template Strand Pam Sites:',5)
-app.addLabel('l12','',6)
-app.addLabel('l13','Sense Strand Pam Sites:',7)
-app.addLabel('l14','',8)
+app.addScrolledTextArea('t1',4)
+app.addButton('Find Pam Sites',findPAMSites,5)
+app.addLabel('l11','Template Strand Pam Sites:',6)
+app.addLabel('l12','',7)
+app.addLabel('l13','Sense Strand Pam Sites:',8)
+app.addLabel('l14','',9)
 app.hideLabel('l11')
 app.hideLabel('l12')
 app.hideLabel('l13')
