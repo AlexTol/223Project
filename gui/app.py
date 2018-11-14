@@ -1,5 +1,6 @@
 from appJar import gui
 
+import os
 import sys
 sys.path.append("..") # Adds higher directory to python modules path.
 #the file system now starts from the directory above
@@ -115,12 +116,34 @@ def showRegion1():
 
 def hideRegion2():
     try:
-        app.removeButton('tba1')
+        app.removeOptionBox('Species')
+    except:
+        print('widget already hidden')
+    try:
+        app.removeOptionBox('Chromosome')
+    except:
+        print('widget already hidden')
+    try:
+        app.removeOptionBox('Gene')
     except:
         print('widget already hidden')
 
 def showRegion2():
-    app.addButton('tba1',holder,4)
+    #app.addButton('tba1',holder,4)
+    app.addOptionBox("Species", [], 4,1)
+    app.addOptionBox("Chromosome", [], 5,1)
+    app.addOptionBox("Gene", [], 6,1)
+    
+    os.chdir('..')
+    os.chdir('models/genomes')
+    genomes = []
+    genomes.append(' ')
+    for dirname, dirnames, filenames in os.walk('.'):
+        if(dirname != '.'):
+            genomes.append(dirname.strip('.\\'))
+
+    app.changeOptionBox("Species",genomes)    
+
 
 def hideRegion3():
     try:
