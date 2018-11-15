@@ -128,9 +128,14 @@ def hideRegion2():
     except:
         print('widget already hidden')
 
+    os.chdir(returnPath)
+
 def showRegion2():
     #app.addButton('tba1',holder,4)
-    app.addOptionBox("Species", [], 4,1)
+    global returnPath
+    returnPath = os.getcwd()
+    app.addOptionBox("Species", [], 4,1, callFunction=True)
+    app.setOptionBoxChangeFunction('Species', speciesPick)
     app.addOptionBox("Chromosome", [], 5,1)
     app.addOptionBox("Gene", [], 6,1)
     
@@ -218,6 +223,12 @@ def changeFunc(rb):
         hideRegion2()
         hideRegion3()
         showRegion4()
+    
+def speciesPick():
+    os.chdir(returnPath)
+    os.chdir('..')
+    os.chdir('models/genomes')
+    print('hi')
 
 app = gui("CRISPR TOOL","400x400")
 
