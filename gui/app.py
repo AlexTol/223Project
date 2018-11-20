@@ -1,11 +1,14 @@
 from appJar import gui
 
+import requests
+import json
 import os
 import sys
 sys.path.append("..") # Adds higher directory to python modules path.
 #the file system now starts from the directory above
 from modules import PAMFinder
 from modules import GRNAGenerator
+from models.ChromosomeRegion import ChromosomeRegion
 
 
 def holder(btn):
@@ -127,17 +130,48 @@ def hideRegion2():
         app.removeOptionBox('Gene')
     except:
         print('widget already hidden')
+    try:
+        app.removeButton('Get GRNA for Gene')
+    except:
+        print('widget already hidden')
+    try:
+        app.removeLabel('l31')
+    except:
+        print('widget already hidden')
+    try:
+        app.removeLabel('l32')
+    except:
+        print('widget already hidden')
+    try:
+        app.removeLabel('l33')
+    except:
+        print('widget already hidden')
+    try:
+        app.removeLabel('l34')
+    except:
+        print('widget already hidden')
 
     os.chdir(returnPath)
 
 def showRegion2():
     #app.addButton('tba1',holder,4)
-    global returnPath
-    returnPath = os.getcwd()
     app.addOptionBox("Species", [], 4,1, callFunction=True)
     app.setOptionBoxChangeFunction('Species', speciesPick)
     app.addOptionBox("Chromosome", [], 5,1)
+    app.hideOptionBox('Chromosome')
+    app.setOptionBoxChangeFunction('Chromosome', chromosomePick)
     app.addOptionBox("Gene", [], 6,1)
+    app.hideOptionBox('Gene')
+    app.addButton('Get GRNA for Gene',getGRNAForGene,7)
+    app.addLabel('l31','Template Strands',8)
+    app.hideLabel('l31')
+    app.addLabel('l32','',9)
+    app.hideLabel('l32')
+    app.addLabel('l33','Sense Strands',10)
+    app.hideLabel('l33')
+    app.addLabel('l34','',11)
+    app.hideLabel('l34')
+    
     
     os.chdir('..')
     os.chdir('models/genomes')
@@ -228,7 +262,66 @@ def speciesPick():
     os.chdir(returnPath)
     os.chdir('..')
     os.chdir('models/genomes')
-    print('hi')
+    
+    species = app.getOptionBox('Species')
+    os.chdir(species)
+
+    chromosomes = []
+    chromosomes.append(' ')
+    for dirname, dirnames, filenames in os.walk('.'):
+        for mfile in filenames:
+            chromosomes.append(mfile.strip('\.txt'))
+    app.changeOptionBox("Chromosome",chromosomes) 
+
+    app.showOptionBox('Chromosome')
+
+
+def chromosomePick():
+    chromosome = app.getOptionBox('Chromosome')
+    string = ''
+    with open(chromosome + '.txt') as f:
+        for line in f:
+            string = string + line
+    
+    global ncr
+    ncr = ChromosomeRegion()
+    ncr.fromJSON(json.loads(string))
+
+
+    genes = []
+    genes.append('')
+    for gene, region in ncr.genes.items():
+        genes.append(gene)
+
+    app.changeOptionBox("Gene",genes)
+    app.showOptionBox('Gene')
+
+def getGRNAForGene():
+    site = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
+    params = {}
+    params['db'] = 'nucleotide'
+    params['id'] = str(ncr.id)
+    params['rettype'] = 'fasta'
+
+    gene = app.getOptionBox('Gene')
+    token = ncr.genes[gene].split(',')
+    params['from'] = token[0]
+    params['to'] = token[1]
+
+    r = requests.get(site, params = params)
+    
+    print('here')
+    dna = r.text[130:]
+    dna = dna.strip()
+    dna = dna.replace('\n', '')
+    templateGRNAs, complementGRNAs = GRNAGenerator.generateGRNAPairs(dna)
+    app.setLabel('l32',templateGRNAs)
+    app.setLabel('l34',complementGRNAs)
+    app.showLabel('l31')
+    app.showLabel('l32')
+    app.showLabel('l33')
+    app.showLabel('l34')
+
 
 app = gui("CRISPR TOOL","400x400")
 
@@ -248,5 +341,8 @@ app.hideLabel('l11')
 app.hideLabel('l12')
 app.hideLabel('l13')
 app.hideLabel('l14')
+
+global returnPath
+returnPath = os.getcwd()
 
 app.go()

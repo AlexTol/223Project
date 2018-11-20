@@ -30,13 +30,16 @@ def OstreococcusTauri():
         out.write(jS3)
 
 
-#cr = ChromosomeRegion()
-#cr.assignVals('2R', 'AT5678.1',{'gcc':'100000,200000', 'gpp': '300000,400000'})
+cr = ChromosomeRegion()
+cr.assignVals('2R', 'AT5678.1',{'gcc':'100000,200000', 'gpp': '300000,400000'})
 
-#jString = cr.toJSON()
+jString = cr.toJSON()
 
-#print(jString)
+print(jString)
 
-#ncr = ChromosomeRegion()
-#ncr.fromJSON(json.loads(jString))
-OstreococcusTauri()
+ncr = ChromosomeRegion()
+ncr.fromJSON(json.loads(jString))
+print(ncr.id)
+print(ncr.region)
+print(ncr.genes)
+#OstreococcusTauri()

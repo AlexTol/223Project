@@ -16,5 +16,11 @@ class ChromosomeRegion(object):
             sort_keys=True, indent=4)
 
     def fromJSON(self,j):
-        for item in j:
-            print(item)
+        for item,val in j.items():
+            if(item == 'id'):
+                self.id = val
+            if(item == 'region'):
+                self.region = val
+            if(item == 'genes'):
+                for gene, region in val.items():
+                    self.genes[gene] = region
