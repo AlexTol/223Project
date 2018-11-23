@@ -154,6 +154,7 @@ def hideRegion2():
     os.chdir(returnPath)
 
 def showRegion2():
+    os.chdir(returnPath)
     #app.addButton('tba1',holder,4)
     app.addOptionBox("Species", [], 4,1, callFunction=True)
     app.setOptionBoxChangeFunction('Species', speciesPick)
@@ -186,12 +187,66 @@ def showRegion2():
 
 def hideRegion3():
     try:
-        app.removeButton('tba2')
+        app.removeOptionBox('Species1')
+    except:
+        print('widgey already hidden')
+
+    try:
+        app.removeOptionBox('Chromosome1')
+    except:
+        print('widgey already hidden')
+
+    try:
+        app.removeLabel('l41')
+    except:
+        print('widget already hidden')
+    
+    try:
+        app.removeLabel('l42')
+    except:
+        print('widget already hidden')
+
+    try:
+        app.removeLabel('l43')
+    except:
+        print('widget already hidden')
+
+    try:
+        app.removeLabel('l44')
+    except:
+        print('widget already hidden')
+
+    try:
+        app.removeButton('Get GRNAs for Chr')
     except:
         print('widget already hidden')
 
 def showRegion3():
-    app.addButton('tba2',holder,4)
+    app.addOptionBox("Species1", [], 4,1, callFunction=True)
+    app.setOptionBoxChangeFunction('Species1', speciesPick1)
+    app.addOptionBox("Chromosome1", [], 5,1)
+    app.hideOptionBox('Chromosome1')
+    app.setOptionBoxChangeFunction('Chromosome1', chromosomePick1)
+    app.addLabel('l41','Template Strands',6)
+    app.hideLabel('l41')
+    app.addLabel('l42','',7)
+    app.hideLabel('l42')
+    app.addLabel('l43','Sense Strands',8)
+    app.hideLabel('l43')
+    app.addLabel('l44','',9)
+    app.hideLabel('l44')
+    app.addButton('Get GRNAs for Chr',getGRNAForChromosome,10)
+    app.hideButton('Get GRNAs for Chr')
+
+    os.chdir('..')
+    os.chdir('models/genomes')
+    genomes = []
+    genomes.append(' ')
+    for dirname, dirnames, filenames in os.walk('.'):
+        if(dirname != '.'):
+            genomes.append(dirname.strip('.\\'))
+
+    app.changeOptionBox("Species1",genomes) 
 
 def showRegion4():
     app.addScrolledTextArea('t2',4)
@@ -237,6 +292,7 @@ def hideRegion4():
         print('widget already hidden')
 
 def changeFunc(rb):
+    returnPath = os.getcwd()
     if(app.getRadioButton("option") == "Find all potential PAM sequences"):
         hideRegion2()
         hideRegion3()
@@ -275,6 +331,23 @@ def speciesPick():
 
     app.showOptionBox('Chromosome')
 
+def speciesPick1():
+    os.chdir(returnPath)
+    os.chdir('..')
+    os.chdir('models/genomes')
+    
+    species = app.getOptionBox('Species1')
+    os.chdir(species)
+
+    chromosomes = []
+    chromosomes.append(' ')
+    for dirname, dirnames, filenames in os.walk('.'):
+        for mfile in filenames:
+            chromosomes.append(mfile.strip('\.txt'))
+    app.changeOptionBox("Chromosome1",chromosomes) 
+
+    app.showOptionBox('Chromosome1')
+
 
 def chromosomePick():
     chromosome = app.getOptionBox('Chromosome')
@@ -295,6 +368,19 @@ def chromosomePick():
 
     app.changeOptionBox("Gene",genes)
     app.showOptionBox('Gene')
+
+def chromosomePick1():
+    chromosome = app.getOptionBox('Chromosome1')
+    string = ''
+    with open(chromosome + '.txt') as f:
+        for line in f:
+            string = string + line
+    
+    global ncr
+    ncr = ChromosomeRegion()
+    ncr.fromJSON(json.loads(string))
+
+    app.showButton('Get GRNAs for Chr')
 
 def getGRNAForGene():
     site = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
@@ -321,6 +407,26 @@ def getGRNAForGene():
     app.showLabel('l32')
     app.showLabel('l33')
     app.showLabel('l34')
+
+def getGRNAForChromosome():
+    site = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
+    params = {}
+    params['db'] = 'nucleotide'
+    params['id'] = str(ncr.id)
+    params['rettype'] = 'fasta'
+
+    r = requests.get(site, params = params)
+
+    dna = r.text[130:]
+    dna = dna.strip()
+    dna = dna.replace('\n', '')
+    templateGRNAs, complementGRNAs = GRNAGenerator.generateGRNAPairs(dna)
+    app.setLabel('l42',templateGRNAs)
+    app.setLabel('l44',complementGRNAs)
+    app.showLabel('l41')
+    app.showLabel('l42')
+    app.showLabel('l43')
+    app.showLabel('l44')
 
 
 app = gui("CRISPR TOOL","400x400")
