@@ -221,21 +221,45 @@ def hideRegion3():
     except:
         print('widget already hidden')
 
+    try:
+        app.removeLabel('l45')
+    except:
+        print('widget already hidden')
+
+    try:
+        app.removeLabel('l46')
+    except:
+        print('widget already hidden')
+
+    try:
+        app.removeEntry('E41')
+    except:
+        print('widget already hidden')
+
+    try:
+        app.removeEntry('E42')
+    except:
+        print('widget already hidden')
+
 def showRegion3():
     app.addOptionBox("Species1", [], 4,1, callFunction=True)
     app.setOptionBoxChangeFunction('Species1', speciesPick1)
     app.addOptionBox("Chromosome1", [], 5,1)
     app.hideOptionBox('Chromosome1')
     app.setOptionBoxChangeFunction('Chromosome1', chromosomePick1)
-    app.addLabel('l41','Template Strands',6)
+    app.addLabel('l45','Start',6,0)
+    app.addEntry('E41',6,1)
+    app.addLabel('l46','End',6,2)
+    app.addEntry('E42',6,3)
+    app.addLabel('l41','Template Strands',7)
     app.hideLabel('l41')
-    app.addLabel('l42','',7)
+    app.addLabel('l42','',8)
     app.hideLabel('l42')
-    app.addLabel('l43','Sense Strands',8)
+    app.addLabel('l43','Sense Strands',9)
     app.hideLabel('l43')
-    app.addLabel('l44','',9)
+    app.addLabel('l44','',10)
     app.hideLabel('l44')
-    app.addButton('Get GRNAs for Chr',getGRNAForChromosome,10)
+    app.addButton('Get GRNAs for Chr',getGRNAForChromosome,11)
     app.hideButton('Get GRNAs for Chr')
 
     os.chdir('..')
@@ -413,6 +437,8 @@ def getGRNAForChromosome():
     params = {}
     params['db'] = 'nucleotide'
     params['id'] = str(ncr.id)
+    params['from'] = app.getEntry('E41')
+    params['to'] = app.getEntry('E42')
     params['rettype'] = 'fasta'
 
     r = requests.get(site, params = params)
@@ -421,15 +447,16 @@ def getGRNAForChromosome():
     dna = dna.strip()
     dna = dna.replace('\n', '')
     templateGRNAs, complementGRNAs = GRNAGenerator.generateGRNAPairs(dna)
-    app.setLabel('l42',templateGRNAs)
-    app.setLabel('l44',complementGRNAs)
+    print(templateGRNAs)
+    app.setLabel('l42',templateGRNAs[0:10])
+    app.setLabel('l44',complementGRNAs[0:10])
     app.showLabel('l41')
     app.showLabel('l42')
     app.showLabel('l43')
     app.showLabel('l44')
 
 
-app = gui("CRISPR TOOL","400x400")
+app = gui("CRISPR TOOL","1000x500")
 
 app.addRadioButton("option", "Find all potential PAM sequences",0)
 app.addRadioButton("option", "Get Best GRNA for strand",1)
