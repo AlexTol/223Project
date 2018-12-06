@@ -3,33 +3,44 @@ import sys
 sys.path.append("..")
 from modules import PAMFinder
 
+def get_PAM(seq):
+  pam = re.compile("[ACTG]GG")
+  matches = pam.finditer(seq)
+  pam_loc = []
+  for match in matches:
+    if(match.span()[0] >=20):
+      pam_loc.append(match.span())
+  comp_pam = re.compile("GG[ACTG]")
+  matches = comp_pam.finditer(complementary(seq))
+  comp_loc = []
+  for match in matches:
+    if(len(seq) - match.span()[1] >= 20):
+      comp_loc.append(match.span())
+  return pam_loc, comp_loc
+
+#Input: sequence, Output: complementary sequence
+def complementary(seq):
+  comp_dict = {'A':'T','T':'A','C':'G','G':'C','Y':'R','R':'Y','W':'W','S':'S','K':'M','M':'K','N':'N'}
+  comp_seq = ""
+  for char in seq:
+    comp_seq += comp_dict[char]
+  return comp_seq
+
+seq = "CCTGATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGATAGG"
+
+
 def generateGRNAPairs(template):
-    complement = PAMFinder.complementary(template)
-    templateLocations , complementLocations = PAMFinder.get_PAM(template.upper())
-    regex = "\(([0-9]*)\, ([0-9]*)\)"
+    complement = complementary(template)
+    templateLocations , complementLocations = get_PAM(template.upper())
     tempGRNAs = []
     compGRNAs = []
 
     for tempLoc in templateLocations:
         for compLoc in complementLocations:
-            match1 = re.match(regex,str(tempLoc))
-            match2 = re.match(regex,str(compLoc))
-            if((int(match2.groups()[0]) - int(match1.groups()[1]) <= 20 and int(match2.groups()[0]) - int(match1.groups()[1]) >= 0)):
-                tempGRNAs.append(toGRNA(template,int(match1.groups()[1]), int(match2.groups()[0]) - int(match1.groups()[1])))
-                compGRNAs.append(toGRNA(complement,int(match2.groups()[0]), int(match2.groups()[0]) - int(match1.groups()[1]),False))
+            print(tempLoc, compLoc)
+            difference = tempLoc[0] - compLoc[1]
+            if(difference > 20 and difference <= 40):
+                tempGRNAs.append(template[(tempLoc[0] - 20):tempLoc[0]])
+                compGRNAs.append(complement[compLoc[1]:(compLoc[1]+20)])
     
     return tempGRNAs,compGRNAs
-
-def toGRNA(strand, loc, spaces, isTemplate = True):
-    comp_dict = {'A':'T','T':'A','C':'G','G':'C','Y':'R','R':'Y','W':'W','S':'S','K':'M','M':'K','N':'N'}
-    grna = ''
-    if(isTemplate):
-        for i in range(loc-2,loc+spaces+1):
-            grna = grna + comp_dict[strand[i]]
-        grna = grna[::-1]
-    else:
-        for i in range(loc-spaces,loc+3):
-            grna = grna + comp_dict[strand[i]]
-    print(spaces)
-    print(grna)
-    return grna
