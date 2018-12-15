@@ -37,10 +37,10 @@ def generateGRNAPairs(template):
 
     for tempLoc in templateLocations:
         for compLoc in complementLocations:
-            print(tempLoc, compLoc)
+            #print(tempLoc, compLoc)
             difference = tempLoc[0] - compLoc[1]
-            if(difference > 20 and difference <= 40):
+            if(difference > 20 and difference <= 30):
                 tempGRNAs.append(template[(tempLoc[0] - 20):tempLoc[0]])
                 compGRNAs.append(complement[compLoc[1]:(compLoc[1]+20)])
     
-    return tempGRNAs,compGRNAs
+    return tempGRNAs[:5],compGRNAs[:5]
