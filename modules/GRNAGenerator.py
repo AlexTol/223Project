@@ -42,5 +42,44 @@ def generateGRNAPairs(template):
             if(difference > 20 and difference <= 30):
                 tempGRNAs.append(template[(tempLoc[0] - 20):tempLoc[0]])
                 compGRNAs.append(complement[compLoc[1]:(compLoc[1]+20)])
-    
-    return tempGRNAs[:5],compGRNAs[:5]
+
+    return tempGRNAs[:30],compGRNAs[:30]
+
+def similarityScore(string1, string2):
+    tot = len(string1)
+    score = 0
+
+    for i in range(0,len(string1)):
+        if(string1[i] == string2[i]):
+            score += 1
+
+    return score/len(string1)
+
+def getOffTargetScore(gRNA, msuper):
+    cap = int(len(msuper)/20)
+    score = 1
+    msuper = msuper.replace('\n','')
+
+    comp_dict = {'A':'T','T':'A','C':'G','G':'C','Y':'R','R':'Y','W':'W','S':'S','K':'M','M':'K','N':'N'}
+    sense = ''
+    for i in range(0,len(gRNA)):
+        sense = sense + comp_dict[gRNA[i]]
+
+    for i in range(0,cap):
+        frame = msuper[(i*20):(i*20)+20]
+
+        if(len(frame) < len(sense)):
+            continue
+        if(similarityScore(sense,frame) >= .9):
+          score -= 1
+
+    return score
+
+def chooseBestFive(mdict):
+  sortedDict = sorted(mdict.items(), key=lambda kv: kv[1])
+      
+  best = []
+  for i in range(0,5):
+    best.append(sortedDict[i][0])
+
+  return best

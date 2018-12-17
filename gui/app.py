@@ -425,8 +425,26 @@ def getGRNAForGene():
     dna = dna.strip()
     dna = dna.replace('\n', '')
     templateGRNAs, complementGRNAs = GRNAGenerator.generateGRNAPairs(dna)
-    app.setLabel('l32',templateGRNAs)
-    app.setLabel('l34',complementGRNAs)
+
+    tempScores = []
+    tempDict = {}
+    compScores = []
+    compDict = {}
+    for grna in templateGRNAs:
+        tempScores.append(GRNAGenerator.getOffTargetScore(grna,dna))
+    for i in range(0,len(templateGRNAs)):
+        tempDict[templateGRNAs[i]] = tempScores[i]
+
+    for grna in complementGRNAs:
+        compScores.append(GRNAGenerator.getOffTargetScore(grna,dna))
+    for i in range(0,len(complementGRNAs)):
+        compDict[ complementGRNAs[i]] = compScores[i]
+
+    finalTemplateGRNAs = GRNAGenerator.chooseBestFive(tempDict)
+    finalComplementGRNAs = GRNAGenerator.chooseBestFive(compDict)
+
+    app.setLabel('l32',finalTemplateGRNAs)
+    app.setLabel('l34',finalComplementGRNAs)
     app.showLabel('l31')
     app.showLabel('l32')
     app.showLabel('l33')
@@ -447,9 +465,26 @@ def getGRNAForChromosome():
     dna = dna.strip()
     dna = dna.replace('\n', '')
     templateGRNAs, complementGRNAs = GRNAGenerator.generateGRNAPairs(dna)
-    print(templateGRNAs)
-    app.setLabel('l42',templateGRNAs[0:10])
-    app.setLabel('l44',complementGRNAs[0:10])
+    
+    tempScores = []
+    tempDict = {}
+    compScores = []
+    compDict = {}
+    for grna in templateGRNAs:
+        tempScores.append(GRNAGenerator.getOffTargetScore(grna,dna[:100000]))
+    for i in range(0,len(templateGRNAs)):
+        tempDict[templateGRNAs[i]] = tempScores[i]
+
+    for grna in complementGRNAs:
+        compScores.append(GRNAGenerator.getOffTargetScore(grna,dna[:100000]))
+    for i in range(0,len(complementGRNAs)):
+        compDict[ complementGRNAs[i]] = compScores[i]
+
+    finalTemplateGRNAs = GRNAGenerator.chooseBestFive(tempDict)
+    finalComplementGRNAs = GRNAGenerator.chooseBestFive(compDict)
+
+    app.setLabel('l42',finalTemplateGRNAs)
+    app.setLabel('l44',finalComplementGRNAs)
     app.showLabel('l41')
     app.showLabel('l42')
     app.showLabel('l43')
