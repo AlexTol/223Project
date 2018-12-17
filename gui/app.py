@@ -327,7 +327,7 @@ def changeFunc(rb):
         hideRegion3()
         hideRegion4()
         showRegion2()
-    elif(app.getRadioButton("option") == "Get Best GRNA for chromosome"):
+    elif(app.getRadioButton("option") == "Get Best GRNA for chromosome region"):
         hideRegion1()
         hideRegion2()
         hideRegion4()
@@ -431,20 +431,28 @@ def getGRNAForGene():
     compScores = []
     compDict = {}
     for grna in templateGRNAs:
-        tempScores.append(GRNAGenerator.getOffTargetScore(grna,dna))
+        tempScores.append(GRNAGenerator.getOffTargetScore(grna,dna) + GRNAGenerator.on_target_score(grna))
     for i in range(0,len(templateGRNAs)):
         tempDict[templateGRNAs[i]] = tempScores[i]
 
     for grna in complementGRNAs:
-        compScores.append(GRNAGenerator.getOffTargetScore(grna,dna))
+        compScores.append(GRNAGenerator.getOffTargetScore(grna,dna) + GRNAGenerator.on_target_score(grna))
     for i in range(0,len(complementGRNAs)):
         compDict[ complementGRNAs[i]] = compScores[i]
 
     finalTemplateGRNAs = GRNAGenerator.chooseBestFive(tempDict)
     finalComplementGRNAs = GRNAGenerator.chooseBestFive(compDict)
 
-    app.setLabel('l32',finalTemplateGRNAs)
-    app.setLabel('l34',finalComplementGRNAs)
+    finalTempString = ''
+    for i in range(0,5):
+        finalTempString += str(i + 1) + ' :   ' + finalTemplateGRNAs[i] + '       '
+    
+    finalCompString = ''
+    for i in range(0,5):
+        finalCompString += str(i + 1) + ' :   ' + finalComplementGRNAs[i] + '      '
+
+    app.setLabel('l32',finalTempString)
+    app.setLabel('l34',finalCompString)
     app.showLabel('l31')
     app.showLabel('l32')
     app.showLabel('l33')
@@ -471,32 +479,40 @@ def getGRNAForChromosome():
     compScores = []
     compDict = {}
     for grna in templateGRNAs:
-        tempScores.append(GRNAGenerator.getOffTargetScore(grna,dna[:100000]))
+        tempScores.append(GRNAGenerator.getOffTargetScore(grna,dna[:100000]) + GRNAGenerator.on_target_score(grna))
     for i in range(0,len(templateGRNAs)):
         tempDict[templateGRNAs[i]] = tempScores[i]
 
     for grna in complementGRNAs:
-        compScores.append(GRNAGenerator.getOffTargetScore(grna,dna[:100000]))
+        compScores.append(GRNAGenerator.getOffTargetScore(grna,dna[:100000]) + GRNAGenerator.on_target_score(grna))
     for i in range(0,len(complementGRNAs)):
         compDict[ complementGRNAs[i]] = compScores[i]
 
     finalTemplateGRNAs = GRNAGenerator.chooseBestFive(tempDict)
     finalComplementGRNAs = GRNAGenerator.chooseBestFive(compDict)
 
-    app.setLabel('l42',finalTemplateGRNAs)
-    app.setLabel('l44',finalComplementGRNAs)
+    finalTempString = ''
+    for i in range(0,5):
+        finalTempString += str(i + 1) + ' :   ' + finalTemplateGRNAs[i] + '       '
+    
+    finalCompString = ''
+    for i in range(0,5):
+        finalCompString += str(i + 1) + ' :   ' + finalComplementGRNAs[i] + '      '
+
+    app.setLabel('l42',finalTempString)
+    app.setLabel('l44',finalCompString)
     app.showLabel('l41')
     app.showLabel('l42')
     app.showLabel('l43')
     app.showLabel('l44')
 
 
-app = gui("CRISPR TOOL","1000x500")
+app = gui("CRISPR TOOL","1500x500")
 
 app.addRadioButton("option", "Find all potential PAM sequences",0)
 app.addRadioButton("option", "Get Best GRNA for strand",1)
 app.addRadioButton("option", "Get Best GRNA for gene",2)
-app.addRadioButton("option", "Get Best GRNA for chromosome",3)
+app.addRadioButton("option", "Get Best GRNA for chromosome region",3)
 app.setRadioButtonChangeFunction("option", changeFunc)
 
 app.addScrolledTextArea('t1',4)

@@ -83,3 +83,11 @@ def chooseBestFive(mdict):
     best.append(sortedDict[i][0])
 
   return best
+
+def on_target_score(seq): #make sure to pass in string only
+  score = 100
+  if(seq[0] == 'G' or seq[-1] == 'G'):
+    score -= 50
+  GC_amount = seq.count('G') + seq.count('C')
+  score -= (10 - GC_amount) * 5
+  return score
