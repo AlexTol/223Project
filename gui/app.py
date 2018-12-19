@@ -15,17 +15,42 @@ def holder(btn):
     print('nothing much')
 
 def getGRNA():
-    templateGRNAs, complementGRNAs = GRNAGenerator.generateGRNAPairs(app.getTextArea('t2').upper())
-    
-    templString = ''
-    for item in templateGRNAs:
-        templString = templString + str(item) + ' '
-    complString = ''
-    for item in complementGRNAs:
-        complString = complString + str(item) + ' '
+    templateGRNAs, complementGRNAs = GRNAGenerator.generateGRNAPairs(app.getTextArea('t2').upper().replace('\n',''))
+    tempDict = {}
+    tempScores = []
+    compDict = {}
+    compScores = []
 
-    app.setLabel('l22', templString)
-    app.setLabel('l24', complString)
+    dna = app.getTextArea('t2').upper().replace('\n','')
+
+    for grna in templateGRNAs:
+        tempScores.append(GRNAGenerator.getOffTargetScore(grna,dna[:100000]) + GRNAGenerator.on_target_score(grna))
+    for i in range(0,len(templateGRNAs)):
+        tempDict[templateGRNAs[i]] = tempScores[i]
+
+    for grna in complementGRNAs:
+        compScores.append(GRNAGenerator.getOffTargetScore(grna,dna[:100000]) + GRNAGenerator.on_target_score(grna))
+    for i in range(0,len(complementGRNAs)):
+        compDict[ complementGRNAs[i]] = compScores[i]
+
+    finalDict = {}
+    for i in range(0,len(templateGRNAs)):
+        tup = (templateGRNAs[i],complementGRNAs[i]) 
+        score = tempScores[i] + compScores[i]
+        finalDict[tup] = score
+
+    finalGRNAs = GRNAGenerator.chooseBestFive(finalDict)
+
+    finalTempString = ''
+    for i in range(0,5):
+        finalTempString += str(i + 1) + ' :   ' + finalGRNAs[i][0] + '       '
+    
+    finalCompString = ''
+    for i in range(0,5):
+        finalCompString += str(i + 1) + ' :   ' + finalGRNAs[i][1] + '      '
+
+    app.setLabel('l22', finalTempString)
+    app.setLabel('l24', finalCompString)
 
     try:
         app.showLabel('l21')
@@ -430,6 +455,7 @@ def getGRNAForGene():
     tempDict = {}
     compScores = []
     compDict = {}
+
     for grna in templateGRNAs:
         tempScores.append(GRNAGenerator.getOffTargetScore(grna,dna) + GRNAGenerator.on_target_score(grna))
     for i in range(0,len(templateGRNAs)):
@@ -440,16 +466,23 @@ def getGRNAForGene():
     for i in range(0,len(complementGRNAs)):
         compDict[ complementGRNAs[i]] = compScores[i]
 
-    finalTemplateGRNAs = GRNAGenerator.chooseBestFive(tempDict)
-    finalComplementGRNAs = GRNAGenerator.chooseBestFive(compDict)
+    finalDict = {}
+    for i in range(0,len(templateGRNAs)):
+        tup = (templateGRNAs[i],complementGRNAs[i]) 
+        score = tempScores[i] + compScores[i]
+        finalDict[tup] = score
+
+    finalGRNAs = GRNAGenerator.chooseBestFive(finalDict)
+    #finalTemplateGRNAs = GRNAGenerator.chooseBestFive(tempDict)
+    #finalComplementGRNAs = GRNAGenerator.chooseBestFive(compDict)
 
     finalTempString = ''
     for i in range(0,5):
-        finalTempString += str(i + 1) + ' :   ' + finalTemplateGRNAs[i] + '       '
+        finalTempString += str(i + 1) + ' :   ' + finalGRNAs[i][0] + '       '
     
     finalCompString = ''
     for i in range(0,5):
-        finalCompString += str(i + 1) + ' :   ' + finalComplementGRNAs[i] + '      '
+        finalCompString += str(i + 1) + ' :   ' + finalGRNAs[i][1] + '      '
 
     app.setLabel('l32',finalTempString)
     app.setLabel('l34',finalCompString)
@@ -488,16 +521,21 @@ def getGRNAForChromosome():
     for i in range(0,len(complementGRNAs)):
         compDict[ complementGRNAs[i]] = compScores[i]
 
-    finalTemplateGRNAs = GRNAGenerator.chooseBestFive(tempDict)
-    finalComplementGRNAs = GRNAGenerator.chooseBestFive(compDict)
+    finalDict = {}
+    for i in range(0,len(templateGRNAs)):
+        tup = (templateGRNAs[i],complementGRNAs[i]) 
+        score = tempScores[i] + compScores[i]
+        finalDict[tup] = score
+
+    finalGRNAs = GRNAGenerator.chooseBestFive(finalDict)
 
     finalTempString = ''
     for i in range(0,5):
-        finalTempString += str(i + 1) + ' :   ' + finalTemplateGRNAs[i] + '       '
+        finalTempString += str(i + 1) + ' :   ' + finalGRNAs[i][0] + '       '
     
     finalCompString = ''
     for i in range(0,5):
-        finalCompString += str(i + 1) + ' :   ' + finalComplementGRNAs[i] + '      '
+        finalCompString += str(i + 1) + ' :   ' + finalGRNAs[i][1] + '      '
 
     app.setLabel('l42',finalTempString)
     app.setLabel('l44',finalCompString)
